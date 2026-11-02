@@ -1,0 +1,6 @@
+# Development profile - local PostgreSQL
+spring:
+  datasource:
+    url: ${DB_URL_DEV:jdbc:postgresql://localhost:5432/mayil_boutique_dev}
+    username: ${DB_USERNAME_DEV:postgres}
+    password: ${DB_PASSWORD_DEV:postgres}

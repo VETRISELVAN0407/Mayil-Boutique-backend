@@ -1,0 +1,6 @@
+# Production profile - environment-specific secrets and database
+spring:
+  datasource:
+    url: ${DB_URL_PROD:jdbc:postgresql://localhost:5432/mayil_boutique}
+    username: ${DB_USERNAME_PROD:postgres}
+    password: ${DB_PASSWORD_PROD:postgres}
