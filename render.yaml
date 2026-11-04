@@ -1,0 +1,39 @@
+# Render Blueprint for the Mayil Boutique API (Spring Boot, Docker).
+# Secrets are marked sync:false: Render asks for them in the dashboard; nothing secret lives in git.
+services:
+  - type: web
+    name: mayil-boutique-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/categories/public
+    envVars:
+      # Neon: jdbc:postgresql://<host>/neondb?sslmode=require  (no user/password inside the URL)
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      # First-run admin account (only created when the mobile does not exist yet).
+      - key: ADMIN_MOBILE
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Exact frontend origin, e.g. https://frontend-bice-delta-18.vercel.app
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://frontend-bice-delta-18.vercel.app
+      # Free plan has no persistent disk: keep a copy of uploaded images in PostgreSQL.
+      - key: IMAGE_PERSIST_IN_DB
+        value: "true"
+      - key: PRODUCT_IMAGE_DIR
+        value: /tmp/product-images
+      - key: TRYON_TMP_DIR
+        value: /tmp/tryon-tmp
+      - key: TRYON_ENABLED
+        value: "false"
+      # none = customer OTP login answers 503 until a real SMS provider is configured.
+      - key: SMS_PROVIDER
+        value: none
