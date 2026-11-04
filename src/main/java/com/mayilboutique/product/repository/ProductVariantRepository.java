@@ -29,6 +29,9 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     @Query("SELECT v.productId, SUM(v.stockQuantity) FROM ProductVariant v WHERE v.productId IN :productIds GROUP BY v.productId")
     List<Object[]> sumStockByProductIds(@Param("productIds") Collection<Long> productIds);
 
+    /** In-stock variants of the given products (used for the storefront size/colour filters). */
+    List<ProductVariant> findByProductIdInAndStockQuantityGreaterThan(Collection<Long> productIds, Integer stockQuantity);
+
     boolean existsBySku(String sku);
 
     boolean existsBySkuAndIdNot(String sku, Long id);

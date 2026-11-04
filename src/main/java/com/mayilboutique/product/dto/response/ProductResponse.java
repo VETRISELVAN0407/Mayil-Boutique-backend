@@ -27,6 +27,9 @@ public class ProductResponse {
     /** Running sale campaign that sets {@link #salePrice} (storefront responses only), else null. */
     private String saleName;
     private Instant saleEndsAt;
+    /** Distinct sizes / colours of the in-stock variants (storefront responses only; empty otherwise). */
+    private List<String> sizes = List.of();
+    private List<String> colours = List.of();
 
     public ProductResponse() {
     }
@@ -174,6 +177,22 @@ public class ProductResponse {
 
     public void setSaleName(String saleName) {
         this.saleName = saleName;
+    }
+
+    public List<String> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(List<String> sizes) {
+        this.sizes = sizes;
+    }
+
+    public List<String> getColours() {
+        return colours;
+    }
+
+    public void setColours(List<String> colours) {
+        this.colours = colours;
     }
 
     public Instant getSaleEndsAt() {

@@ -34,6 +34,7 @@ services:
         value: /tmp/tryon-tmp
       - key: TRYON_ENABLED
         value: "false"
-      # none = customer OTP login answers 503 until a real SMS provider is configured.
+      # TEMPORARY test mode: the OTP is shown on the login page instead of being sent by SMS.
+      # Anyone can sign in as any mobile number. Switch to msg91 (or none) before real customers use the shop.
       - key: SMS_PROVIDER
-        value: none
+        value: dummy

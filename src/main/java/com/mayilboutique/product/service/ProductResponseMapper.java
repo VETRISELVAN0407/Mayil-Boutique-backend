@@ -10,6 +10,7 @@ import com.mayilboutique.product.dto.response.ProductImageResponse;
 import com.mayilboutique.product.dto.response.ProductResponse;
 import com.mayilboutique.product.entity.Product;
 import com.mayilboutique.product.entity.ProductImage;
+import com.mayilboutique.product.entity.ProductVariant;
 import com.mayilboutique.product.repository.ProductImageRepository;
 import com.mayilboutique.product.repository.ProductVariantRepository;
 import com.mayilboutique.sale.service.SalePricingService;
@@ -36,6 +37,7 @@ public class ProductResponseMapper {
     public ProductResponse toPublicResponse(Product product) {
         ProductResponse response = toResponse(product);
         applyPricing(response, pricing.priceInfo(product));
+        applyOptions(List.of(response));
         return response;
     }
 
@@ -43,7 +45,27 @@ public class ProductResponseMapper {
         List<ProductResponse> responses = toResponses(products);
         Map<Long, SalePricingService.PriceInfo> info = pricing.priceInfo(products);
         responses.forEach(r -> applyPricing(r, info.get(r.getId())));
+        applyOptions(responses);
         return responses;
+    }
+
+    /** Fills {@code sizes} and {@code colours} from the in-stock variants (one query for the whole list). */
+    private void applyOptions(List<ProductResponse> responses) {
+        if (responses.isEmpty()) {
+            return;
+        }
+        List<Long> ids = responses.stream().map(ProductResponse::getId).toList();
+        Map<Long, List<ProductVariant>> byProduct = variantRepository
+                .findByProductIdInAndStockQuantityGreaterThan(ids, 0).stream()
+                .collect(Collectors.groupingBy(ProductVariant::getProductId));
+        for (ProductResponse response : responses) {
+            List<ProductVariant> variants = byProduct.getOrDefault(response.getId(), List.of());
+            response.setSizes(variants.stream()
+                    .map(v -> v.getSize() != null && !v.getSize().isBlank() ? v.getSize() : v.getSizeNumber())
+                    .filter(s -> s != null && !s.isBlank()).map(String::trim).distinct().toList());
+            response.setColours(variants.stream().map(ProductVariant::getColour)
+                    .filter(c -> c != null && !c.isBlank()).map(String::trim).distinct().toList());
+        }
     }
 
     private static void applyPricing(ProductResponse response, SalePricingService.PriceInfo info) {
